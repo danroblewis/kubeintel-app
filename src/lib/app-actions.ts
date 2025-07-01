@@ -1,15 +1,22 @@
-import { exit, relaunch } from '@tauri-apps/plugin-process';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { clipboardApi } from './api-client';
 import { useToast } from '@/hooks/use-toast';
 
-export const quitApp = async () => await exit(0);
-export const relaunchApp = async () => await relaunch();
+// Web applications don't have quit/relaunch functionality
+export const quitApp = async () => {
+  console.log('Quit not available in web version');
+  window.close(); // This may not work due to browser security
+};
+
+export const relaunchApp = async () => {
+  console.log('Relaunch not available in web version');
+  window.location.reload();
+};
 
 export const copyToClipboard = async (text: string) => {
   // use toast to notify the user
   const { toast } = useToast();
   try {
-    await writeText(text);
+    await clipboardApi.writeText(text);
     toast({
       variant: 'default',
       title: 'Copied to clipboard',

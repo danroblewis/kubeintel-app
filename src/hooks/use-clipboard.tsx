@@ -1,4 +1,4 @@
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { clipboardApi } from '../lib/api-client';
 import { useToast } from '@/hooks/use-toast';
 
 export const useClipboard = () => {
@@ -6,7 +6,7 @@ export const useClipboard = () => {
 
   const copyToClipboard = async (text: string) => {
     try {
-      await writeText(text);
+      await clipboardApi.writeText(text);
       toast({
         variant: 'default',
         title: 'Copied to clipboard',

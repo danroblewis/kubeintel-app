@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubeintel-config
+  namespace: kubeintel
+data:
+  NODE_ENV: "production"
+  PORT: "3001"
+  # Add your specific configuration here
+  # FRONTEND_URL: "https://your-domain.com"
