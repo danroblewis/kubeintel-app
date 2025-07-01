@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from './api';
 import { BaseKubeResourceProps, ListEventsResult } from './types';
 import { CoreV1Event } from '@kubernetes/client-node';
 

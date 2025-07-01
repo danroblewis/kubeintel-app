@@ -41,17 +41,11 @@ import { ResourceTypes } from '@/lib/strings';
 
 // Define the schema for form validation
 const scaleFormSchema = z.object({
-  replicas: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(
-      z.number().min(0, 'Must be 0 or greater').int('Must be a whole number')
-    ),
+  replicas: z.string().min(1, 'Required').regex(/^\d+$/, 'Must be a number'),
 });
 
 // Define types based on the zod schema
-//type ScaleFormSchemaType = z.infer<typeof scaleFormSchema>;
-type ScaleFormValues = z.input<typeof scaleFormSchema>;
+type ScaleFormValues = z.infer<typeof scaleFormSchema>;
 
 interface ResourceActionsProps {
   kind: ResourceTypes;

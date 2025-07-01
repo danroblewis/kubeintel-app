@@ -16,6 +16,9 @@ RUN pnpm build
 # Backend builder stage
 FROM node:18-alpine AS backend-builder
 
+# Install build tools for native modules
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app/server
 
 # Copy backend package files
@@ -32,8 +35,8 @@ RUN npm run build
 # Production stage
 FROM node:18-alpine AS production
 
-# Install kubectl
-RUN apk add --no-cache curl && \
+# Install kubectl and build tools for native modules
+RUN apk add --no-cache curl python3 make g++ && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
     chmod +x kubectl && \
     mv kubectl /usr/local/bin/
@@ -42,7 +45,7 @@ WORKDIR /app
 
 # Copy backend production dependencies
 COPY server/package.json ./
-RUN npm install --only=production
+RUN npm install --omit=dev
 
 # Copy built backend
 COPY --from=backend-builder /app/server/dist ./dist

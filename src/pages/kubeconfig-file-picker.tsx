@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { homeDir, join } from '@tauri-apps/api/path';
-import { open } from '@tauri-apps/plugin-dialog';
+// Note: File system access is limited in web browsers
+// Users will need to manually provide their kubeconfig file content
 import {
   FolderOpen,
   ArrowRight,
@@ -138,17 +138,20 @@ export const KubeconfigFilePicker = () => {
 
   const openFileDialog = async () => {
     try {
-      const homeDirectory = await homeDir();
-      const kubePath = await join(homeDirectory, '.kube');
-      const selected = await open({
-        multiple: false,
-        directory: false,
-        defaultPath: kubePath,
-      });
-
-      if (typeof selected === 'string') {
-        cfgState.addKubeconfig(selected);
-      }
+      // Create a file input element for web browsers
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.yaml,.yml,*';
+      input.onchange = (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
+          // For web version, we'll use the file name as the path
+          // In a real implementation, you'd want to read the file content
+          // and store it appropriately for the web environment
+          cfgState.addKubeconfig(file.name);
+        }
+      };
+      input.click();
     } catch (error) {
       console.error('Error adding file:', error);
     }

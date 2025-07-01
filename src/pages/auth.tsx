@@ -10,11 +10,10 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/routes';
 import { useConfigStore } from '@/stores/use-config-store';
-import { Command } from '@tauri-apps/plugin-shell';
 import { AlertCircle } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '../lib/api';
 
 // authenticate the cluster
 export const Auth = () => {
@@ -42,30 +41,33 @@ export const Auth = () => {
     setCmdOutput([]);
     setError(null);
     setCode(-1);
-    const command = Command.create('kubectl', cmdArgs);
-    command.on('close', (data) => {
-      console.log(
-        `command finished with code ${data.code} and signal ${data.signal}`
-      );
+    
+    try {
+      const result = await invoke<{
+        success: boolean;
+        output: string;
+        error?: string;
+      }>('kubernetes/cluster-info', {
+        kubeconfig,
+        context,
+      });
+      
       setExecuting(false);
-      if (data.code !== 0) {
-        setError(`Command failed with code ${data.code}`);
+      
+      if (result.success) {
+        setCmdOutput([result.output]);
+        setCode(0);
+      } else {
+        setError(result.error || 'Command failed');
+        setCmdOutput([result.error || 'Unknown error']);
+        setCode(1);
       }
-
-      setCode(data.code == null ? -1 : data.code);
-    });
-    command.on('error', (error) => {
-      console.error(`command error: "${error}"`);
+    } catch (error) {
+      console.error('Error running command:', error);
       setExecuting(false);
-      setError(error);
-    });
-    command.stdout.on('data', (line) =>
-      setCmdOutput((prev) => [...prev, line])
-    );
-    command.stderr.on('data', (line) => {
-      setCmdOutput((prev) => [...prev, line]);
-    });
-    await command.spawn();
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      setCode(1);
+    }
   };
 
   useEffect(() => {

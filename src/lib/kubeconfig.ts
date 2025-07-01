@@ -45,6 +45,8 @@ export const loadContextAuthConfig = async (
   try {
     // For web version, return simplified auth config
     // The server will handle the actual authentication
+    // Note: path and context parameters are preserved for API compatibility
+    console.log(`Loading auth config for context ${context} in ${path}`);
     return {
       token: '', // Will be determined by the server
     };

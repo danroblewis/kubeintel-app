@@ -111,17 +111,17 @@ function handlePodShell(ws: WebSocket, data: any) {
       env: process.env
     });
 
-    ptyProcess.on('data', (data) => {
+    ptyProcess.onData((data: string) => {
       ws.send(JSON.stringify({
         type: 'shell_data',
         data
       }));
     });
 
-    ptyProcess.on('exit', (code) => {
+    ptyProcess.onExit((exitCode: { exitCode: number; signal?: number }) => {
       ws.send(JSON.stringify({
         type: 'shell_exit',
-        code
+        code: exitCode.exitCode
       }));
     });
 

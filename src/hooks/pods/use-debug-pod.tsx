@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '../../lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseDebugPodProps {

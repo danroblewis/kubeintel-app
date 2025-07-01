@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import superjson from 'superjson';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '../lib/api';
 import { V1Namespace } from '@kubernetes/client-node';
 import { Kubeconfig } from '@/lib/types';
 
