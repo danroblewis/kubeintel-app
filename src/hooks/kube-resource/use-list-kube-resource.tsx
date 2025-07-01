@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { invoke } from '@tauri-apps/api/core';
+import { kubernetesApi } from '../../lib/api-client';
 import { ListKubeResourceProps } from '../../lib/types';
 
 export const useListKubeResource = <T extends object>({
@@ -15,12 +15,12 @@ export const useListKubeResource = <T extends object>({
         throw new Error('Missing required parameters');
       }
 
-      return invoke<T[]>(`list_resource`, {
+      return kubernetesApi.listResource({
         kubeconfigPath,
         context,
         namespace,
         resourceType,
-      });
+      }) as Promise<T[]>;
     },
     enabled: Boolean(kubeconfigPath && context),
     retry: 1,

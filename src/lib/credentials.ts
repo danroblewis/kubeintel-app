@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { credentialsApi } from './api-client';
 
 export const credentials = {
   setSecret: async ({
@@ -8,14 +8,15 @@ export const credentials = {
     key: string;
     value: string;
   }): Promise<void> => {
-    await invoke('set_secret', { key, value });
+    await credentialsApi.setSecret(key, value);
   },
 
   getSecret: async (key: string): Promise<string> => {
-    return invoke<string>('get_secret', { key });
+    const result = await credentialsApi.getSecret(key);
+    return result.value || '';
   },
 
   removeSecret: async (key: string): Promise<void> => {
-    await invoke('remove_secret', { key });
+    await credentialsApi.removeSecret(key);
   },
 };

@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { configApi } from './api-client';
 import { AuthInfo, Kubeconfig } from './types';
 
 type loadKubeconfigReturnType = {
@@ -12,17 +12,16 @@ export const loadKubeconfig = async (
   path: string
 ): Promise<loadKubeconfigReturnType> => {
   try {
-    const config = await invoke<Kubeconfig>('read_kubeconfig', {
-      kubeconfigPath: path,
-    });
+    const config = await configApi.readKubeconfig(path) as Kubeconfig;
     const currentContextName =
       config['current-context'] || config.contexts[0]?.name;
     const contexts = config.contexts.map((ctx: { name: string }) => ctx.name);
 
-    const authConfig = await invoke<AuthInfo>('cluster_config_auth', {
-      kubeconfigPath: path,
-      context: currentContextName,
-    });
+    // For web version, we'll return a simplified auth config
+    // The actual authentication will be handled by the server
+    const authConfig: AuthInfo = {
+      token: '', // Will be handled by the server
+    };
 
     return {
       contexts,
@@ -44,11 +43,11 @@ export const loadContextAuthConfig = async (
   context: string
 ): Promise<AuthInfo> => {
   try {
-    const authConfig = await invoke<AuthInfo>('cluster_config_auth', {
-      kubeconfigPath: path,
-      context,
-    });
-    return authConfig;
+    // For web version, return simplified auth config
+    // The server will handle the actual authentication
+    return {
+      token: '', // Will be determined by the server
+    };
   } catch (error) {
     console.error('Error loading context auth config:', error);
     throw error instanceof Error ? error : new Error(String(error));
